@@ -35,7 +35,7 @@ async function listPickupRequests(req, res, next) {
     const pickups = await PickupRequest.find(filter)
       .sort({ pickupTime: 1 })
       .lean();
-    
+
     // Enrich with household area info for collector view
     if (status === 'pending' || !status) {
       const Household = require('../models/Household');
@@ -43,21 +43,21 @@ async function listPickupRequests(req, res, next) {
       const households = await Household.find({
         householdId: { $in: householdIds },
       }).lean();
-      
+
       const householdMap = households.reduce((acc, h) => {
         acc[h.householdId] = h;
         return acc;
       }, {});
-      
+
       const enriched = pickups.map((p) => ({
         ...p,
         area: householdMap[p.householdId]?.area || 'Unknown',
         householdLocation: householdMap[p.householdId]?.location || null,
       }));
-      
+
       return res.json(enriched);
     }
-    
+
     res.json(pickups);
   } catch (err) {
     next(err);
@@ -93,6 +93,7 @@ async function completePickup(req, res, next) {
     }
 
     pickup.status = 'completed';
+    pickup.completedBy = req.user.userId;
     await pickup.save();
 
     // Award points only if segregation was verified

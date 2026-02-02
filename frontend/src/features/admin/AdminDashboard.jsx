@@ -180,6 +180,35 @@ const AdminDashboard = () => {
                                 <p className="text-xs font-semibold text-blue-900 mb-1">Verification Rate</p>
                                 <p className="text-2xl font-bold text-blue-600">{performance?.verificationRate || 0}%</p>
                             </div>
+
+                            {/* Collector Breakdown Table */}
+                            {performance?.collectorBreakdown?.length > 0 && (
+                                <div className="mt-6">
+                                    <h3 className="text-sm font-bold text-slate-800 mb-3">Collector Breakdown</h3>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-xs text-left">
+                                            <thead>
+                                                <tr className="text-slate-500 border-b border-gray-100">
+                                                    <th className="pb-2 font-medium">Name</th>
+                                                    <th className="pb-2 font-medium text-center">Done</th>
+                                                    <th className="pb-2 font-medium text-center">Verified</th>
+                                                    <th className="pb-2 font-medium text-right">Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-50">
+                                                {performance.collectorBreakdown.map((c) => (
+                                                    <tr key={c.name} className="hover:bg-gray-50/50">
+                                                        <td className="py-2 text-slate-700 font-medium">{c.name}</td>
+                                                        <td className="py-2 text-center text-slate-600">{c.completed}</td>
+                                                        <td className="py-2 text-center text-emerald-600">{c.verified}</td>
+                                                        <td className="py-2 text-right font-bold text-primary">{c.rate.toFixed(0)}%</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

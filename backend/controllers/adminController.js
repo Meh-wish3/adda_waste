@@ -60,30 +60,57 @@ async function getWasteStats(req, res, next) {
     }
 }
 
+const User = require('../models/User');
+
 // Get collector performance
 async function getCollectorPerformance(req, res, next) {
     try {
-        // For now, we'll show pickups by verification status
-        // In a full implementation, this would group by collector
-        const verified = await PickupRequest.countDocuments({
-            segregationVerified: true,
-        });
+        const stats = await PickupRequest.aggregate([
+            { $match: { status: 'completed', completedBy: { $exists: true } } },
+            {
+                $group: {
+                    _id: '$completedBy',
+                    completedCount: { $sum: 1 },
+                    verifiedCount: {
+                        $sum: { $cond: [{ $eq: ['$segregationVerified', true] }, 1, 0] }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'collector'
+                }
+            },
+            { $unwind: '$collector' },
+            {
+                $project: {
+                    name: '$collector.name',
+                    completed: '$completedCount',
+                    verified: '$verifiedCount',
+                    rate: {
+                        $multiply: [
+                            { $divide: ['$verifiedCount', '$completedCount'] },
+                            100
+                        ]
+                    }
+                }
+            }
+        ]);
 
-        const notVerified = await PickupRequest.countDocuments({
-            segregationVerified: false,
-        });
-
-        const completedPickups = await PickupRequest.countDocuments({
-            status: 'completed',
-        });
+        const totalVerified = await PickupRequest.countDocuments({ segregationVerified: true, status: 'completed' });
+        const totalCompleted = await PickupRequest.countDocuments({ status: 'completed' });
 
         res.json({
-            totalCompleted: completedPickups,
-            verified,
-            notVerified,
-            verificationRate: completedPickups > 0
-                ? ((verified / completedPickups) * 100).toFixed(1)
+            totalCompleted,
+            verified: totalVerified,
+            notVerified: totalCompleted - totalVerified,
+            verificationRate: totalCompleted > 0
+                ? ((totalVerified / totalCompleted) * 100).toFixed(1)
                 : 0,
+            collectorBreakdown: stats
         });
     } catch (err) {
         next(err);
