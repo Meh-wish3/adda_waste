@@ -1,0 +1,29 @@
+{
+  "name": "ward4-waste-backend",
+  "version": "1.0.0",
+  "description": "Ward-level source segregation & pickup prototype backend for Guwahati hackathon (Track 4 - SDG 12).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seedDatabase.js"
+  },
+  "keywords": [
+    "waste-management",
+    "guwahati",
+    "ward-level",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

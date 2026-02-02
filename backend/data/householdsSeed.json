@@ -1,0 +1,47 @@
+[
+  { "householdId": "H001", "headName": "Das Family", "area": "Bhetapara - Lane 1", "location": { "lat": 26.115, "lng": 91.808 } },
+  { "householdId": "H002", "headName": "Sharma Family", "area": "Bhetapara - Lane 1", "location": { "lat": 26.1151, "lng": 91.8082 } },
+  { "householdId": "H003", "headName": "Ali Family", "area": "Bhetapara - Lane 1", "location": { "lat": 26.1153, "lng": 91.8084 } },
+  { "householdId": "H004", "headName": "Gogoi Family", "area": "Bhetapara - Lane 2", "location": { "lat": 26.116, "lng": 91.809 } },
+  { "householdId": "H005", "headName": "Borah Family", "area": "Bhetapara - Lane 2", "location": { "lat": 26.1162, "lng": 91.8092 } },
+  { "householdId": "H006", "headName": "Sarmah Family", "area": "Bhetapara - Lane 2", "location": { "lat": 26.1164, "lng": 91.8094 } },
+  { "householdId": "H007", "headName": "Choudhury Family", "area": "Bhetapara - Lane 3", "location": { "lat": 26.117, "lng": 91.81 } },
+  { "householdId": "H008", "headName": "Hazarika Family", "area": "Bhetapara - Lane 3", "location": { "lat": 26.1172, "lng": 91.8102 } },
+  { "householdId": "H009", "headName": "Singh Family", "area": "Bhetapara - Lane 3", "location": { "lat": 26.1174, "lng": 91.8104 } },
+
+  { "householdId": "H010", "headName": "Patowary Family", "area": "Bhangagarh - Block A", "location": { "lat": 26.144, "lng": 91.736 } },
+  { "householdId": "H011", "headName": "Ahmed Family", "area": "Bhangagarh - Block A", "location": { "lat": 26.1442, "lng": 91.7362 } },
+  { "householdId": "H012", "headName": "Basu Family", "area": "Bhangagarh - Block A", "location": { "lat": 26.1444, "lng": 91.7364 } },
+  { "householdId": "H013", "headName": "Nath Family", "area": "Bhangagarh - Block B", "location": { "lat": 26.145, "lng": 91.737 } },
+  { "householdId": "H014", "headName": "Deka Family", "area": "Bhangagarh - Block B", "location": { "lat": 26.1452, "lng": 91.7372 } },
+  { "householdId": "H015", "headName": "Roy Family", "area": "Bhangagarh - Block B", "location": { "lat": 26.1454, "lng": 91.7374 } },
+
+  { "householdId": "H016", "headName": "Kalita Family", "area": "GS Road - Point 1", "location": { "lat": 26.144, "lng": 91.742 } },
+  { "householdId": "H017", "headName": "Bhuyan Family", "area": "GS Road - Point 1", "location": { "lat": 26.1442, "lng": 91.7422 } },
+  { "householdId": "H018", "headName": "Dasgupta Family", "area": "GS Road - Point 1", "location": { "lat": 26.1444, "lng": 91.7424 } },
+  { "householdId": "H019", "headName": "Lahkar Family", "area": "GS Road - Point 2", "location": { "lat": 26.145, "lng": 91.743 } },
+  { "householdId": "H020", "headName": "Paul Family", "area": "GS Road - Point 2", "location": { "lat": 26.1452, "lng": 91.7432 } },
+  { "householdId": "H021", "headName": "Verma Family", "area": "GS Road - Point 2", "location": { "lat": 26.1454, "lng": 91.7434 } },
+  { "householdId": "H022", "headName": "Saha Family", "area": "GS Road - Point 3", "location": { "lat": 26.146, "lng": 91.744 } },
+  { "householdId": "H023", "headName": "Hussain Family", "area": "GS Road - Point 3", "location": { "lat": 26.1462, "lng": 91.7442 } },
+  { "householdId": "H024", "headName": "Baruah Family", "area": "GS Road - Point 3", "location": { "lat": 26.1464, "lng": 91.7444 } },
+
+  { "householdId": "H025", "headName": "Saikia Family", "area": "Beltola - Market Side", "location": { "lat": 26.104, "lng": 91.791 } },
+  { "householdId": "H026", "headName": "Chakraborty Family", "area": "Beltola - Market Side", "location": { "lat": 26.1042, "lng": 91.7912 } },
+  { "householdId": "H027", "headName": "Pegu Family", "area": "Beltola - Market Side", "location": { "lat": 26.1044, "lng": 91.7914 } },
+  { "householdId": "H028", "headName": "Mishra Family", "area": "Beltola - Residential Cluster", "location": { "lat": 26.105, "lng": 91.792 } },
+  { "householdId": "H029", "headName": "Biswas Family", "area": "Beltola - Residential Cluster", "location": { "lat": 26.1052, "lng": 91.7922 } },
+  { "householdId": "H030", "headName": "Rehman Family", "area": "Beltola - Residential Cluster", "location": { "lat": 26.1054, "lng": 91.7924 } },
+
+  { "householdId": "H031", "headName": "Talukdar Family", "area": "Bhetapara - Lane 1", "location": { "lat": 26.1155, "lng": 91.8085 } },
+  { "householdId": "H032", "headName": "Bhattacharya Family", "area": "Bhetapara - Lane 2", "location": { "lat": 26.1165, "lng": 91.8095 } },
+  { "householdId": "H033", "headName": "Chandra Family", "area": "Bhetapara - Lane 3", "location": { "lat": 26.1175, "lng": 91.8105 } },
+  { "householdId": "H034", "headName": "Borah-2 Family", "area": "Bhangagarh - Block A", "location": { "lat": 26.1446, "lng": 91.7366 } },
+  { "householdId": "H035", "headName": "Dutta Family", "area": "Bhangagarh - Block B", "location": { "lat": 26.1456, "lng": 91.7376 } },
+  { "householdId": "H036", "headName": "Khan Family", "area": "GS Road - Point 1", "location": { "lat": 26.1446, "lng": 91.7426 } },
+  { "householdId": "H037", "headName": "Prasad Family", "area": "GS Road - Point 2", "location": { "lat": 26.1456, "lng": 91.7436 } },
+  { "householdId": "H038", "headName": "Das-2 Family", "area": "GS Road - Point 3", "location": { "lat": 26.1466, "lng": 91.7446 } },
+  { "householdId": "H039", "headName": "Singh-2 Family", "area": "Beltola - Market Side", "location": { "lat": 26.1046, "lng": 91.7916 } },
+  { "householdId": "H040", "headName": "Sarkar Family", "area": "Beltola - Residential Cluster", "location": { "lat": 26.1056, "lng": 91.7926 } }
+]
+
