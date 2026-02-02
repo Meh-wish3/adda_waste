@@ -26,6 +26,8 @@ app.use('/api/collectors', require('./routes/collectors'));
 app.use('/api/incentives', require('./routes/incentives'));
 app.use('/api/route', require('./routes/route'));
 app.use('/api/seed', require('./routes/seed'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Global error handler (simple)
 // eslint-disable-next-line no-unused-vars

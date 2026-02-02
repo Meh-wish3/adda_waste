@@ -1,56 +1,58 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
-import CitizenPickupForm from './features/citizen/CitizenPickupForm';
-import CitizenStatusView from './features/citizen/CitizenStatusView';
-import CollectorDashboard from './features/collector/CollectorDashboard';
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 import LandingPage from './features/landing/LandingPage';
 import LoginPage from './features/auth/LoginPage';
 import SignupPage from './features/auth/SignupPage';
-
-// Protected Route Component (Mock)
-const ProtectedRoute = ({ children }) => {
-  // For demo purposes, we'll allow access. 
-  // In a real app, this would check authentication state.
-  return children;
-};
-
-const DashboardLayout = () => {
-  const [activeTab, setActiveTab] = useState('citizen');
-
-  return (
-    <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {activeTab === 'citizen' ? (
-        <>
-          <CitizenPickupForm />
-          <CitizenStatusView />
-        </>
-      ) : (
-        <CollectorDashboard />
-      )}
-    </Layout>
-  );
-};
+import CitizenDashboard from './features/citizen/CitizenDashboard';
+import CollectorDashboardWrapper from './features/collector/CollectorDashboardWrapper';
+import AdminDashboard from './features/admin/AdminDashboard';
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route
-          path="/app"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        />
-        {/* Redirect unknown routes to landing */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
+          {/* Protected Routes - Role-Based */}
+          <Route
+            path="/citizen"
+            element={
+              <PrivateRoute allowedRoles={['CITIZEN']}>
+                <CitizenDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/collector"
+            element={
+              <PrivateRoute allowedRoles={['COLLECTOR']}>
+                <CollectorDashboardWrapper />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute allowedRoles={['ADMIN']}>
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Legacy route redirect */}
+          <Route path="/app" element={<Navigate to="/login" replace />} />
+
+          {/* Redirect unknown routes to landing */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 

@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -14,11 +17,30 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate login delay
-        setTimeout(() => {
+        setError('');
+
+        try {
+            const user = await login(formData.email, formData.password);
+
+            // Redirect based on role
+            switch (user.role) {
+                case 'CITIZEN':
+                    navigate('/citizen');
+                    break;
+                case 'COLLECTOR':
+                    navigate('/collector');
+                    break;
+                case 'ADMIN':
+                    navigate('/admin');
+                    break;
+                default:
+                    navigate('/');
+            }
+        } catch (err) {
+            setError(err || 'Login failed. Please try again.');
+        } finally {
             setLoading(false);
-            navigate('/app');
-        }, 1500);
+        }
     };
 
     return (
@@ -44,6 +66,12 @@ const LoginPage = () => {
 
                 <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-glass p-8 border border-white/50">
                     <form onSubmit={handleSubmit} className="space-y-5">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
+
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                             <div className="relative">
@@ -74,14 +102,6 @@ const LoginPage = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-sm">
-                            <label className="flex items-center gap-2 text-slate-600 cursor-pointer">
-                                <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary/20" />
-                                Remember me
-                            </label>
-                            <a href="#" className="font-medium text-emerald-600 hover:text-emerald-700">Forgot password?</a>
-                        </div>
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -96,6 +116,16 @@ const LoginPage = () => {
                                 </>
                             )}
                         </button>
+
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                            <p className="text-xs font-semibold text-blue-900 mb-2">Demo Credentials:</p>
+                            <div className="space-y-1 text-xs text-blue-700">
+                                <p>👤 Citizen: <code className="bg-white px-1 rounded">citizen@test.com</code></p>
+                                <p>🚛 Collector: <code className="bg-white px-1 rounded">collector@test.com</code></p>
+                                <p>👨‍💼 Admin: <code className="bg-white px-1 rounded">admin@test.com</code></p>
+                                <p className="mt-1">Password: <code className="bg-white px-1 rounded">password</code></p>
+                            </div>
+                        </div>
                     </form>
 
                     <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-slate-500">

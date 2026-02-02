@@ -40,6 +40,9 @@ const CitizenPickupForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [points, setPoints] = useState(0);
+  const [location, setLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('idle'); // idle, requesting, granted, denied, fallback
+  const [useManualArea, setUseManualArea] = useState(false);
 
   useEffect(() => {
     fetchHouseholds()
@@ -61,6 +64,42 @@ const CitizenPickupForm = () => {
       .catch(() => { });
   }, [selectedHousehold]);
 
+  // Request geolocation on component mount or when household changes
+  useEffect(() => {
+    if (!selectedHousehold || useManualArea) return;
+
+    if ('geolocation' in navigator) {
+      setLocationStatus('requesting');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setLocationStatus('granted');
+        },
+        (error) => {
+          console.warn('Geolocation denied or failed:', error);
+          setLocationStatus('denied');
+          // Fallback: use household's area location if available
+          const household = households.find((h) => h.householdId === selectedHousehold);
+          if (household?.location?.lat && household?.location?.lng) {
+            setLocation(household.location);
+            setLocationStatus('fallback');
+          }
+        },
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    } else {
+      setLocationStatus('denied');
+      const household = households.find((h) => h.householdId === selectedHousehold);
+      if (household?.location?.lat && household?.location?.lng) {
+        setLocation(household.location);
+        setLocationStatus('fallback');
+      }
+    }
+  }, [selectedHousehold, households, useManualArea]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedHousehold || !pickupTime) return;
@@ -72,8 +111,18 @@ const CitizenPickupForm = () => {
         wasteType,
         pickupTime,
         overflow,
+        location, // Include location if available
       });
-      setMessage('Pickup scheduled successfully! +Points earned');
+
+      // Refresh points after successful submission
+      fetchIncentives(selectedHousehold)
+        .then((data) => setPoints(data.points || 0))
+        .catch(() => { });
+
+      setMessage('Pickup scheduled successfully! Location shared with collector.');
+      // Reset form
+      setPickupTime('');
+      setOverflow(false);
     } catch (err) {
       setMessage('Failed to schedule pickup. Please try again.');
     } finally {
@@ -102,7 +151,10 @@ const CitizenPickupForm = () => {
             <div className="relative">
               <select
                 value={selectedHousehold}
-                onChange={(e) => setSelectedHousehold(e.target.value)}
+                onChange={(e) => {
+                  setSelectedHousehold(e.target.value);
+                  setUseManualArea(false);
+                }}
                 className="w-full rounded-2xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer hover:bg-white"
               >
                 {households.map((h) => (
@@ -114,6 +166,48 @@ const CitizenPickupForm = () => {
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                 ▼
               </div>
+            </div>
+
+            {/* Location Status */}
+            <div className="mt-2 text-xs">
+              {locationStatus === 'requesting' && (
+                <p className="text-blue-600 flex items-center gap-1">
+                  <MapPin size={12} /> Requesting location...
+                </p>
+              )}
+              {locationStatus === 'granted' && location && (
+                <p className="text-emerald-600 flex items-center gap-1">
+                  <CheckCircle2 size={12} /> Location shared: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              )}
+              {locationStatus === 'denied' && (
+                <div className="flex items-center gap-2">
+                  <p className="text-amber-600 flex items-center gap-1">
+                    <AlertTriangle size={12} /> Location access denied
+                  </p>
+                  {!useManualArea && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUseManualArea(true);
+                        const household = households.find((h) => h.householdId === selectedHousehold);
+                        if (household?.location) {
+                          setLocation(household.location);
+                          setLocationStatus('fallback');
+                        }
+                      }}
+                      className="text-primary underline text-xs"
+                    >
+                      Use area location
+                    </button>
+                  )}
+                </div>
+              )}
+              {locationStatus === 'fallback' && location && (
+                <p className="text-slate-500 flex items-center gap-1">
+                  <MapPin size={12} /> Using area location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              )}
             </div>
           </div>
 
@@ -133,8 +227,8 @@ const CitizenPickupForm = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setWasteType(opt.value)}
                     className={`relative p-4 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col gap-2 ${isSelected
-                        ? `border-primary bg-primary/5 shadow-md`
-                        : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                      ? `border-primary bg-primary/5 shadow-md`
+                      : 'border-transparent bg-gray-50 hover:bg-gray-100'
                       }`}
                   >
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-white text-slate-400'
@@ -169,8 +263,8 @@ const CitizenPickupForm = () => {
 
             <div
               className={`rounded-2xl border-2 p-4 cursor-pointer transition-all duration-200 flex items-start gap-3 ${overflow
-                  ? 'border-red-400 bg-red-50'
-                  : 'border-dashed border-gray-300 hover:border-red-300 hover:bg-red-50/30'
+                ? 'border-red-400 bg-red-50'
+                : 'border-dashed border-gray-300 hover:border-red-300 hover:bg-red-50/30'
                 }`}
               onClick={() => setOverflow(!overflow)}
             >
@@ -204,8 +298,8 @@ const CitizenPickupForm = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`p-4 rounded-xl text-sm font-medium flex items-center gap-3 ${message.includes('success')
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : 'bg-red-100 text-red-800'
+                ? 'bg-emerald-100 text-emerald-800'
+                : 'bg-red-100 text-red-800'
                 }`}
             >
               {message.includes('success') ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}

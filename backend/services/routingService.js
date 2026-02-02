@@ -40,12 +40,15 @@ async function generateShiftRoute() {
   }, {});
 
   // 3. Enrich pickup requests with area info.
+  // Prefer location from pickup request (citizen's geolocation), fallback to household location
   const enriched = pendingPickups.map((p) => {
     const h = householdById[p.householdId];
     return {
       ...p,
       area: h ? h.area : 'Unknown',
-      location: h ? h.location : null,
+      location: p.location && p.location.lat && p.location.lng 
+        ? p.location  // Use citizen's geolocation if available
+        : (h && h.location ? h.location : null), // Fallback to household area location
     };
   });
 

@@ -10,10 +10,15 @@ export const generateRoute = async () => {
   return res.data;
 };
 
-export const completePickup = async (id, { correctSegregation }) => {
-  const res = await api.patch(`/pickups/${id}/complete`, {
-    correctSegregation,
+export const verifySegregation = async (id, { verified }) => {
+  const res = await api.patch(`/pickups/${id}/verify`, {
+    verified,
   });
+  return res.data;
+};
+
+export const completePickup = async (id) => {
+  const res = await api.patch(`/pickups/${id}/complete`);
   return res.data;
 };
 

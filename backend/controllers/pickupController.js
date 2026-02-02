@@ -3,7 +3,7 @@ const { addIncentivePoints } = require('../services/incentiveService');
 
 async function createPickupRequest(req, res, next) {
   try {
-    const { householdId, wasteType, pickupTime, overflow } = req.body;
+    const { householdId, wasteType, pickupTime, overflow, location } = req.body;
 
     if (!householdId || !wasteType || !pickupTime) {
       return res
@@ -16,6 +16,7 @@ async function createPickupRequest(req, res, next) {
       wasteType,
       pickupTime,
       overflow: !!overflow,
+      location: location && location.lat && location.lng ? location : undefined,
     });
 
     res.status(201).json(pickup);
@@ -34,7 +35,49 @@ async function listPickupRequests(req, res, next) {
     const pickups = await PickupRequest.find(filter)
       .sort({ pickupTime: 1 })
       .lean();
+    
+    // Enrich with household area info for collector view
+    if (status === 'pending' || !status) {
+      const Household = require('../models/Household');
+      const householdIds = [...new Set(pickups.map((p) => p.householdId))];
+      const households = await Household.find({
+        householdId: { $in: householdIds },
+      }).lean();
+      
+      const householdMap = households.reduce((acc, h) => {
+        acc[h.householdId] = h;
+        return acc;
+      }, {});
+      
+      const enriched = pickups.map((p) => ({
+        ...p,
+        area: householdMap[p.householdId]?.area || 'Unknown',
+        householdLocation: householdMap[p.householdId]?.location || null,
+      }));
+      
+      return res.json(enriched);
+    }
+    
     res.json(pickups);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function verifySegregation(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { verified } = req.body;
+
+    const pickup = await PickupRequest.findById(id);
+    if (!pickup) {
+      return res.status(404).json({ message: 'Pickup request not found' });
+    }
+
+    pickup.segregationVerified = verified === true;
+    await pickup.save();
+
+    res.json({ pickup });
   } catch (err) {
     next(err);
   }
@@ -43,7 +86,6 @@ async function listPickupRequests(req, res, next) {
 async function completePickup(req, res, next) {
   try {
     const { id } = req.params;
-    const { correctSegregation, wasteTypeOverride } = req.body || {};
 
     const pickup = await PickupRequest.findById(id);
     if (!pickup) {
@@ -53,10 +95,10 @@ async function completePickup(req, res, next) {
     pickup.status = 'completed';
     await pickup.save();
 
+    // Award points only if segregation was verified
     let incentive = null;
-    if (correctSegregation) {
-      const wType = wasteTypeOverride || pickup.wasteType;
-      incentive = await addIncentivePoints(pickup.householdId, wType);
+    if (pickup.segregationVerified) {
+      incentive = await addIncentivePoints(pickup.householdId, pickup.wasteType);
     }
 
     res.json({ pickup, incentive });
@@ -68,6 +110,7 @@ async function completePickup(req, res, next) {
 module.exports = {
   createPickupRequest,
   listPickupRequests,
+  verifySegregation,
   completePickup,
 };
 

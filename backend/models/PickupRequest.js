@@ -20,11 +20,19 @@ const PickupRequestSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    location: {
+      lat: { type: Number },
+      lng: { type: Number },
+    },
     status: {
       type: String,
       enum: ['pending', 'assigned', 'completed'],
       default: 'pending',
       index: true,
+    },
+    segregationVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
